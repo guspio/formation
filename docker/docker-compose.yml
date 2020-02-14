@@ -1,0 +1,61 @@
+version: "3.7"
+services:
+  laravel:
+    image: gusp/formation
+    container_name: formation-laravel
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+      target: build
+    entrypoint: php-fpm
+    volumes:
+      - /var/www/app/vendor # Keep built vendor packages
+      - ..:/var/www/app     # Mount root directory
+    networks:
+      default:
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: formation-nginx
+    restart: unless-stopped
+    volumes:
+      - ..:/var/www/app
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+    ports:
+      - 8080:80
+    networks:
+      default:
+        aliases:
+          - formation.gusp.local
+  postgres:
+    image: postgres:12.1-alpine
+    container_name: formation-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: arkopolis
+      POSTGRES_PASSWORD: arkopolis
+      POSTGRES_DB: orders
+    volumes:
+      - postgres-volume:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      default:
+        aliases:
+          - formation.postgres
+  redis:
+    image: redis:5.0-alpine
+    container_name: formation-redis
+    ports:
+      - 6379:6379
+    networks:
+      default:
+        aliases:
+          - formation.redis
+
+volumes:
+  postgres-volume:
+
+networks:
+  default:
+    name: formation-network
