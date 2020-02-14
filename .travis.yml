@@ -13,5 +13,6 @@ deploy:
   region: ${AWS_REGION}
   app: ${BEANSTALK_APP}
   env: ${BEANSTALK_ENV}
+  bucket: ${BEANSTALK_BUCKET}
   wait_until_deployed: true
   edge: true # opt in to dpl v2
